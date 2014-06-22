@@ -44,6 +44,7 @@ mymodel$ntree
 colMeans(mymodel$err.rate)
 mymodel$confusion
 summary(mymodel)
+plot(mymodel)
 ```
 We can see that classifier is pretty precise — error rate is smaller than 0.5%.
 

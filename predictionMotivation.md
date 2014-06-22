@@ -121,6 +121,12 @@ summary(mymodel)
 ## inbag               0  -none- NULL     
 ## terms               3  terms  call
 ```
+
+```r
+plot(mymodel)
+```
+
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5.png) 
 We can see that classifier is pretty precise — error rate is smaller than 0.5%.
 
 And now get error rate for test and training sets
