@@ -1,0 +1,65 @@
+Building activity class prediction based on human activity data
+========================================================
+
+Here we try to build model to predict activity class based on measurment from wearable sensors like Jawbone and etc.
+We use data from  http://groupware.les.inf.puc-rio.br/har. There are 19622 samples from 6 people in dataset. For classification we will use random forest algorithm.
+
+Clean-up data set
+==
+
+First we will load and clean-up our test set.
+```{r cache=TRUE}
+TrainData<-read.csv("pml-training.csv")
+summary(colSums(is.na(TrainData)))
+summary(colSums(TrainData == ""))
+```
+We can see that number of NA's and empty strings in our data is equal for each column where ots presented, and it's more than 95% of data set. We can easy remove all that column
+
+```{r cache=TRUE}
+my_cols<-colSums(TrainData == "")
+my_cols[is.na(my_cols)]<-19000
+my_cols<-my_cols==0
+CleanedTrainData<-TrainData[,my_cols]
+```
+Next we can remove timestamp, username, window-related info and number of experiment which will not have any usefull information
+```{r }
+CleanedTrainData<-CleanedTrainData[,8:60]
+```
+
+Fit Model
+==
+We will use random forest to fit our model with default parameters. 
+We divide our date into train and test set (70% and 30% resp.) and fit the model
+```{r}
+library(randomForest)
+set.seed(987)
+splitInd<-rbinom(19622, 1, 0.3)==1
+TrainSet<-CleanedTrainData[!splitInd,]
+TestSet<-CleanedTrainData[splitInd,]
+mymodel<-randomForest(classe~., data = TrainSet)
+```
+We get model, lets take a look
+```{r}
+mymodel$ntree
+colMeans(mymodel$err.rate)
+mymodel$confusion
+summary(mymodel)
+```
+We can see that classifier is pretty precise — error rate is smaller than 0.5%.
+
+And now get error rate for test and training sets
+```{r}
+trainPrediction<-predict(mymodel, TrainSet)
+testPrediction<-predict(mymodel, TestSet)
+trainError = sum(trainPrediction!=TrainSet[,53])/length(trainPrediction)
+testError = sum(testPrediction!=TestSet[,53])/length(testPrediction)
+trainError
+testError
+```
+
+We can see that error rate is also very small for test set, so classifier is pretty efficient at all.
+
+Additional Insights
+==
+Probably we can clean up confusion matrix by include "user_name" in the prediction, but this will confuse model when we try to predict activity for new user. Also efficency of prediction for new user is not guarantied.
+
