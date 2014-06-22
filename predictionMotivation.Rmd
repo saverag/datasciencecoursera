@@ -46,6 +46,7 @@ mymodel$confusion
 summary(mymodel)
 plot(mymodel)
 ```
+
 We can see that classifier is pretty precise — error rate is smaller than 0.5%.
 
 And now get error rate for test and training sets
